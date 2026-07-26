@@ -6,7 +6,7 @@ import { PlusIcon, UploadIcon, TrashIcon, PencilIcon, GripIcon } from '../compon
 
 const FILTERS = [...CATEGORIES, 'All']
 
-export default function Wardrobe({ items, onAdd, onUpdate, onDelete, onReorder }) {
+export default function Wardrobe({ items, outfits = [], onAdd, onUpdate, onDelete, onReorder }) {
   const [filter, setFilter] = useState('Tops')
   const [adding, setAdding] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
@@ -165,6 +165,9 @@ export default function Wardrobe({ items, onAdd, onUpdate, onDelete, onReorder }
       {editingItem && (
         <EditItemSheet
           item={editingItem}
+          outfitCount={outfits.filter((o) =>
+            [o.topId, o.bottomId, o.shoesId].includes(editingItem.id)
+          ).length}
           onClose={() => setEditingItem(null)}
           onSave={(patch) => {
             onUpdate(editingItem.id, patch)
@@ -518,7 +521,7 @@ function RemoveBgToggle({ value, onToggle, disabled }) {
   )
 }
 
-function EditItemSheet({ item, onClose, onSave }) {
+function EditItemSheet({ item, outfitCount = 0, onClose, onSave }) {
   const [category, setCategory] = useState(item.category)
   const [name, setName] = useState(item.name || '')
 
@@ -534,6 +537,12 @@ function EditItemSheet({ item, onClose, onSave }) {
       >
         <img src={item.image} alt={item.name || item.category} className="h-full w-full object-contain p-2" />
       </div>
+
+      <p className="mt-2 text-center text-xs text-subtle">
+        {outfitCount === 0
+          ? 'Not used in any saved outfits'
+          : `Used in ${outfitCount} saved outfit${outfitCount === 1 ? '' : 's'}`}
+      </p>
 
       <div className="mt-4">
         <p className="mb-2 text-sm font-medium">Category</p>

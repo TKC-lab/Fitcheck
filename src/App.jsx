@@ -77,7 +77,7 @@ export default function App() {
     <div className="mx-auto flex min-h-full max-w-md flex-col">
       <main className="flex-1 pb-28 pt-safe">
         {tab === 'wardrobe' && (
-          <Wardrobe items={items} onAdd={addItem} onUpdate={updateItem} onDelete={deleteItem} onReorder={reorderItems} />
+          <Wardrobe items={items} outfits={outfits} onAdd={addItem} onUpdate={updateItem} onDelete={deleteItem} onReorder={reorderItems} />
         )}
         {tab === 'build' && (
           <Builder

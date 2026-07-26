@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { CATEGORIES, OCCASIONS } from '../lib/storage.js'
 import SwipeStack from '../components/SwipeStack.jsx'
 import Sheet from '../components/Sheet.jsx'
-import { CheckIcon } from '../components/icons.jsx'
+import { CheckIcon, ShuffleIcon } from '../components/icons.jsx'
 
 export default function Builder({ items, onSave, onGoToWardrobe }) {
   const byCat = useMemo(
@@ -38,6 +38,22 @@ export default function Builder({ items, onSave, onGoToWardrobe }) {
 
   const hasAny = items.length > 0
   const canSave = selected.Tops && selected.Bottoms && selected.Shoes
+  const canShuffle = CATEGORIES.some((c) => byCat[c].length > 1)
+
+  const shuffle = () => {
+    setIdx((prev) => {
+      const next = { ...prev }
+      for (const c of CATEGORIES) {
+        const len = byCat[c].length
+        if (len <= 1) continue
+        // Always land on a different item so the tap visibly does something.
+        let pick = Math.floor(Math.random() * len)
+        if (pick === prev[c]) pick = (pick + 1) % len
+        next[c] = pick
+      }
+      return next
+    })
+  }
 
   const handleSave = ({ name, occasion }) => {
     const ok = onSave({
@@ -76,7 +92,19 @@ export default function Builder({ items, onSave, onGoToWardrobe }) {
 
   return (
     <div className="px-4">
-      <Header />
+      <Header
+        action={
+          canShuffle && (
+            <button
+              onClick={shuffle}
+              className="grid h-11 w-11 place-items-center rounded-full bg-ink text-canvas shadow-card transition active:scale-95"
+              aria-label="Shuffle outfit"
+            >
+              <ShuffleIcon className="h-5 w-5" />
+            </button>
+          )
+        }
+      />
 
       <div className="mt-4 space-y-4">
         {CATEGORIES.map((c) => (
@@ -115,11 +143,14 @@ export default function Builder({ items, onSave, onGoToWardrobe }) {
   )
 }
 
-function Header() {
+function Header({ action = null }) {
   return (
-    <header className="pt-2">
-      <h1 className="text-2xl font-semibold tracking-tight">Build Outfit</h1>
-      <p className="text-sm text-subtle">Swipe each row to mix and match</p>
+    <header className="flex items-center justify-between pt-2">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Build Outfit</h1>
+        <p className="text-sm text-subtle">Swipe each row to mix and match</p>
+      </div>
+      {action}
     </header>
   )
 }
